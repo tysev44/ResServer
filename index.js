@@ -83,15 +83,34 @@ app.use(session({
 // ---connecting to database-- //
 // ---------------- //
 
-mongoose.connect('mongodb+srv://tysev8301:oaWkFBiWMImk6NJg@cluster0.bwf8u.mongodb.net/e-commerce', {
-    maxPoolSize: 200 
-})
-.catch((error) => {
-    console.error('Error connecting to MongoDB', error);
+const uri = 'mongodb+srv://tysev8301:oaWkFBiWMImk6NJg@cluster0.bwf8u.mongodb.net/e-commerce?retryWrites=true&w=majority';
+
+// Connection options
+const options = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  maxPoolSize: 200, // Adjust connection pool size as needed
+};
+
+// Connect to MongoDB
+mongoose
+  .connect(uri, options)
+  .catch((error) => {
+    console.error('Error connecting to MongoDB:', error);
+  });
+
+// Listen for successful connection
+mongoose.connection.once('open', () => {
+  console.log('Connected to MongoDB');
 });
 
-mongoose.connection.once('open', () => {
-    console.log('Connected to MongoDB');
+// Optional: Additional event listeners for connection management
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB connection disconnected');
 });
 
 
