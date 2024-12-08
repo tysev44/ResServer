@@ -54,7 +54,7 @@ const postupload = multer({
 
 const apiLimiter = rateLimit({
     store: new MongoStore({
-      uri: 'mongodb://127.0.0.1:27017/e-commerce', // MongoDB URI
+      uri: 'mongodb+srv://tysev8301:oaWkFBiWMImk6NJg@cluster0.bwf8u.mongodb.net/e-commerce', // MongoDB URI
       collectionName: 'rateLimit', // Name of the collection for storing rate limit data
       expireTimeMs: 15 * 60 * 1000, // Expiration time for each entry
       userKey: (req) => req.ip, // Use IP address as the identifier for limiting requests
@@ -83,7 +83,7 @@ app.use(session({
 // ---connecting to database-- //
 // ---------------- //
 
-mongoose.connect('mongodb://localhost:27017/e-commerce', {
+mongoose.connect('mongodb+srv://tysev8301:oaWkFBiWMImk6NJg@cluster0.bwf8u.mongodb.net/e-commerce', {
     maxPoolSize: 200 
 })
 .catch((error) => {
