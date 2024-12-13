@@ -126,16 +126,16 @@ mongoose.connection.on('disconnected', () => {
   console.log('MongoDB connection disconnected');
 });
 
-mongoose.connect('mongodb+srv://tysev8301:oaWkFBiWMImk6NJg@cluster0.bwf8u.mongodb.net/e-commerce?retryWrites=true&w=majority', {
-    maxPoolSize: 500
-})
-.catch((error) => {
-    console.error('Error connecting to MongoDB', error);
-});
+// mongoose.connect('mongodb+srv://tysev8301:oaWkFBiWMImk6NJg@cluster0.bwf8u.mongodb.net/e-commerce?retryWrites=true&w=majority', {
+//     maxPoolSize: 500
+// })
+// .catch((error) => {
+//     console.error('Error connecting to MongoDB', error);
+// });
  
-mongoose.connection.once('open', () => {
-    console.log('Connected to MongoDB');
-});
+// mongoose.connection.once('open', () => {
+//     console.log('Connected to MongoDB');
+// });
 
 
 ////////////////////////////////////////
