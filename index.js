@@ -52,6 +52,8 @@ const postupload = multer({
     storage: storage
 })
 
+app.set('trust proxy', true);
+
 let store;
 
 try {
