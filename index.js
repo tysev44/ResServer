@@ -57,7 +57,7 @@ let store;
 try {
   // Initialize MongoStore with error handling
   store = new MongoStore({
-    uri: 'mongodb://127.0.0.1:27017/e-commerce', // Updated URI to avoid IPv6
+    uri: 'mongodb+srv://tysev8301:oaWkFBiWMImk6NJg@cluster0.bwf8u.mongodb.net/e-commerce?retryWrites=true&w=majority', // Updated URI to avoid IPv6
     collectionName: 'rateLimit', // Collection for storing rate limit data
     expireTimeMs: 15 * 60 * 1000, // Expiration time for each entry
     userKey: (req) => req.ip, // Use IP address as the identifier
@@ -96,8 +96,37 @@ app.use(session({
 // ---connecting to database-- //
 // ---------------- //
 
+const uri = 'mongodb+srv://tysev8301:oaWkFBiWMImk6NJg@cluster0.bwf8u.mongodb.net/e-commerce?retryWrites=true&w=majority';
 
-mongoose.connect('mongodb://localhost:27017/e-commerce', {
+// Connection options
+const options = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  maxPoolSize: 200, // Adjust connection pool size as needed
+};
+
+// Connect to MongoDB
+mongoose
+  .connect(uri, options)
+  .catch((error) => {
+    console.error('Error connecting to MongoDB:', error);
+  });
+
+// Listen for successful connection
+mongoose.connection.once('open', () => {
+  console.log('Connected to MongoDB');
+});
+
+// Optional: Additional event listeners for connection management
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB connection disconnected');
+});
+
+mongoose.connect('mongodb+srv://tysev8301:oaWkFBiWMImk6NJg@cluster0.bwf8u.mongodb.net/e-commerce?retryWrites=true&w=majority', {
     maxPoolSize: 500
 })
 .catch((error) => {
