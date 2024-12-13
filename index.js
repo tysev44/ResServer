@@ -52,13 +52,26 @@ const postupload = multer({
     storage: storage
 })
 
+let store;
+
+try {
+  // Initialize MongoStore with error handling
+  store = new MongoStore({
+    uri: 'mongodb://127.0.0.1:27017/e-commerce', // Updated URI to avoid IPv6
+    collectionName: 'rateLimit', // Collection for storing rate limit data
+    expireTimeMs: 15 * 60 * 1000, // Expiration time for each entry
+    userKey: (req) => req.ip, // Use IP address as the identifier
+  });
+
+  // Optional: Add an error listener for runtime errors console.log('MongoStore initialized successfully.');
+} catch (error) {
+    console.error('Failed to initialize MongoStore:', error.message);
+    // Exit the process or use a fallback
+    process.exit(1);
+  }
+
 const apiLimiter = rateLimit({
-    store: new MongoStore({
-      uri: 'mongodb+srv://tysev8301:oaWkFBiWMImk6NJg@cluster0.bwf8u.mongodb.net/e-commerce', // MongoDB URI
-      collectionName: 'rateLimit', // Name of the collection for storing rate limit data
-      expireTimeMs: 15 * 60 * 1000, // Expiration time for each entry
-      userKey: (req) => req.ip, // Use IP address as the identifier for limiting requests
-    }),
+    store,
     windowMs: 15 * 60 * 1000, // 15 minutes window
     max: 200, // Limit each IP to 100 requests per windowMs
     message: 'Too many requests from this IP, please try again after 15 minutes.',
@@ -83,34 +96,16 @@ app.use(session({
 // ---connecting to database-- //
 // ---------------- //
 
-const uri = 'mongodb+srv://tysev8301:oaWkFBiWMImk6NJg@cluster0.bwf8u.mongodb.net/e-commerce?retryWrites=true&w=majority';
 
-// Connection options
-const options = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  maxPoolSize: 200, // Adjust connection pool size as needed
-};
-
-// Connect to MongoDB
-mongoose
-  .connect(uri, options)
-  .catch((error) => {
-    console.error('Error connecting to MongoDB:', error);
-  });
-
-// Listen for successful connection
+mongoose.connect('mongodb://localhost:27017/e-commerce', {
+    maxPoolSize: 500
+})
+.catch((error) => {
+    console.error('Error connecting to MongoDB', error);
+});
+ 
 mongoose.connection.once('open', () => {
-  console.log('Connected to MongoDB');
-});
-
-// Optional: Additional event listeners for connection management
-mongoose.connection.on('error', (err) => {
-  console.error('MongoDB connection error:', err);
-});
-
-mongoose.connection.on('disconnected', () => {
-  console.log('MongoDB connection disconnected');
+    console.log('Connected to MongoDB');
 });
 
 
@@ -481,6 +476,23 @@ app.post('/DeletProduct', apiLimiter, async (req, res) => {
         });
         
         res.json({ status: 'success'});
+    } catch (error) {
+        res.json({ status: 'error', message: 'Server error' });
+    }
+});
+
+app.post('/Editlocation', apiLimiter, async (req, res) => {
+    try {
+        const uid = req.session.uid
+        const address = req.body.address;
+
+        if(uid){
+            await Users.updateOne({_id: uid}, {address: address})
+            res.json({ status: 'success'});
+        }else{
+            res.json({ status: 'offline' });
+        }
+        
     } catch (error) {
         res.json({ status: 'error', message: 'Server error' });
     }
@@ -1138,4 +1150,4 @@ app.post('/deletlike', apiLimiter, async(req, res)=>{
 
 
 // Start the Express server
-app.listen(4000);
+app.listen(4000, '0.0.0.0');
